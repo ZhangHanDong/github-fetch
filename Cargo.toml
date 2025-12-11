@@ -1,0 +1,78 @@
+[package]
+name = "github-fetch"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+description = "A comprehensive GitHub API client for fetching issues, PRs, reviews, discussions, and diffs with filtering support"
+authors = ["Alex Zhang <zhanghandong@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/ZhangHanDong/github-fetch"
+homepage = "https://github.com/ZhangHanDong/github-fetch"
+documentation = "https://docs.rs/github-fetch"
+readme = "README.md"
+keywords = ["github", "api", "pull-request", "code-review", "async"]
+categories = ["api-bindings", "asynchronous", "development-tools"]
+exclude = [
+    ".claude/",
+    "skills/",
+    "claude-plugin.json",
+    "github-fetch-plugin.zip",
+]
+
+[badges]
+maintenance = { status = "actively-developed" }
+
+[dependencies]
+# GitHub API integration
+octocrab = "0.45"
+
+# HTTP client for GraphQL
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Async runtime
+tokio = { version = "1.36", features = ["full"] }
+
+# Regex for parsing
+regex = "1.10"
+
+# Logging
+log = "0.4"
+
+[dev-dependencies]
+env_logger = "0.10"
+tokio-test = "0.4"
+
+[[example]]
+name = "fetch_tokio_issue"
+path = "examples/fetch_tokio_issue.rs"
+
+[[example]]
+name = "fetch_axum_pr"
+path = "examples/fetch_axum_pr.rs"
+
+[[example]]
+name = "fetch_pr_review"
+path = "examples/fetch_pr_review.rs"
+
+[[example]]
+name = "fetch_with_filters"
+path = "examples/fetch_with_filters.rs"
+
+[[example]]
+name = "fetch_actix_discussion"
+path = "examples/fetch_actix_discussion.rs"
+
+[[example]]
+name = "advanced_usage"
+path = "examples/advanced_usage.rs"
