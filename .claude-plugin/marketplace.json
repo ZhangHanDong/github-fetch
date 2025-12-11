@@ -1,0 +1,29 @@
+{
+  "name": "github-fetch",
+  "owner": {
+    "name": "Alex Zhang",
+    "email": "alex@example.com"
+  },
+  "metadata": {
+    "description": "GitHub API tools for fetching PRs, reviews, diffs, and discussions",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "pr-review",
+      "source": "./.claude/skills/pr-review",
+      "description": "Fetch PR code diff and review comments from GitHub, analyze reviews, fix code issues, and re-review changes",
+      "version": "0.1.0",
+      "author": {
+        "name": "Alex Zhang"
+      },
+      "homepage": "https://github.com/ZhangHanDong/github-fetch",
+      "repository": "https://github.com/ZhangHanDong/github-fetch",
+      "license": "MIT OR Apache-2.0",
+      "keywords": ["github", "pull-request", "code-review", "diff", "pr-review"],
+      "category": "development",
+      "tags": ["github", "pr", "review", "code-review"],
+      "strict": false
+    }
+  ]
+}

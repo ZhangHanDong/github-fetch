@@ -41,16 +41,32 @@ src/
   discussion.rs - GraphQL-based discussion fetching
   error.rs      - Error types
 examples/       - Usage examples
-skills/         - Claude Code Skills
+.claude/skills/ - Claude Code Skills
 ```
 
 ## Skills
 
 This project includes a Claude Code Skill for PR review workflows:
 
-- Location: `skills/pr-review/`
+- Location: `.claude/skills/pr-review/`
 - Purpose: Fetch PR data, analyze reviews, fix code issues, and re-review
 
 ## Environment Variables
 
 - `GITHUB_TOKEN` - Required for GitHub API authentication
+
+## CI/CD
+
+The project uses GitHub Actions for CI. See `.github/workflows/ci.yml`:
+
+- **test**: Build and run unit tests
+- **lint**: Format and clippy checks
+- **skill-validation**: Validates SKILL.md structure and frontmatter
+- **integration-test**: API tests (requires GITHUB_TOKEN)
+- **examples**: Verify all examples compile
+
+Run locally:
+```bash
+cargo test                           # Unit tests
+cargo test --ignored -- --nocapture  # Integration tests (needs GITHUB_TOKEN)
+```

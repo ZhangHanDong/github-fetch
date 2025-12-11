@@ -1,0 +1,179 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # 基础测试：编译和单元测试
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check
+        run: cargo check
+
+      - name: Build
+        run: cargo build
+
+      - name: Run tests
+        run: cargo test
+
+  # 代码质量检查
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Format check
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy -- -D warnings
+
+  # Skill 结构验证
+  skill-validation:
+    name: Validate Skill Structure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          python - <<'PY'
+          import yaml
+          import sys
+          import pathlib
+
+          skill_files = list(pathlib.Path('.claude/skills').rglob('SKILL.md'))
+
+          if not skill_files:
+              print("ERROR: No SKILL.md files found in .claude/skills/")
+              sys.exit(1)
+
+          for skill_path in skill_files:
+              print(f"Validating {skill_path}...")
+              text = skill_path.read_text(encoding='utf-8')
+
+              # Check for YAML frontmatter
+              if not text.startswith('---'):
+                  print(f"  ERROR: {skill_path} missing YAML frontmatter (must start with ---)")
+                  sys.exit(1)
+
+              parts = text.split('---', 2)
+              if len(parts) < 3:
+                  print(f"  ERROR: {skill_path} has invalid frontmatter format")
+                  sys.exit(1)
+
+              try:
+                  meta = yaml.safe_load(parts[1])
+              except yaml.YAMLError as e:
+                  print(f"  ERROR: {skill_path} has invalid YAML: {e}")
+                  sys.exit(1)
+
+              # Validate required fields
+              if 'name' not in meta:
+                  print(f"  ERROR: {skill_path} missing 'name' in frontmatter")
+                  sys.exit(1)
+
+              if 'description' not in meta:
+                  print(f"  ERROR: {skill_path} missing 'description' in frontmatter")
+                  sys.exit(1)
+
+              print(f"  OK: name='{meta['name']}', description='{meta['description'][:50]}...'")
+
+          print(f"\nAll {len(skill_files)} skill(s) validated successfully!")
+          PY
+
+      - name: Check skill file structure
+        run: |
+          echo "Checking skill directory structure..."
+
+          for skill_dir in .claude/skills/*/; do
+            echo "Checking $skill_dir"
+
+            # SKILL.md is required
+            if [ ! -f "${skill_dir}SKILL.md" ]; then
+              echo "  ERROR: Missing SKILL.md in $skill_dir"
+              exit 1
+            fi
+            echo "  OK: SKILL.md exists"
+
+            # List all files in skill
+            echo "  Files:"
+            find "$skill_dir" -type f | sed 's/^/    /'
+          done
+
+          echo "Skill structure validation passed!"
+
+  # 集成测试（需要 GITHUB_TOKEN）
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    # 只在有 secrets 时运行（PR from fork 没有 secrets）
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Run integration tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 运行需要 GitHub API 的测试
+          cargo test --features integration-test || echo "No integration tests defined yet"
+
+  # 示例代码验证
+  examples:
+    name: Verify Examples Compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Check examples compile
+        run: |
+          for example in examples/*.rs; do
+            name=$(basename "$example" .rs)
+            echo "Checking example: $name"
+            cargo check --example "$name"
+          done

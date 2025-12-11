@@ -1,0 +1,12 @@
+{
+  "name": "pr-review",
+  "version": "0.1.0",
+  "description": "Fetch PR code diff and review comments from GitHub, analyze reviews, fix code issues, and re-review changes",
+  "author": {
+    "name": "Alex Zhang"
+  },
+  "homepage": "https://github.com/ZhangHanDong/github-fetch",
+  "repository": "https://github.com/ZhangHanDong/github-fetch",
+  "license": "MIT OR Apache-2.0",
+  "keywords": ["github", "pull-request", "code-review", "diff", "pr-review"]
+}
