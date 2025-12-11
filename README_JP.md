@@ -222,26 +222,31 @@ match fetcher.fetch_issue(&repo, 999999).await {
 
 ### インストール方法
 
-#### 方法1：Claude Code プラグインとしてインストール（推奨）
+#### 方法1：プロジェクトレベルインストール（推奨）
+
+Skill をプロジェクトの `skills/` ディレクトリにクローンまたはコピー：
 
 ```bash
-claude plugins add https://github.com/ZhangHanDong/github-fetch
+# リポジトリをクローンしてプロジェクトに skill をコピー
+git clone https://github.com/ZhangHanDong/github-fetch.git
+cp -r github-fetch/skills/pr-review your-project/skills/
+
+# このライブラリを使用している場合、skills は skills/pr-review/ に含まれています
 ```
 
-#### 方法2：手動で Skill をコピー
+Claude Code はプロジェクトで作業する際に自動的に Skill を検出します。
 
-```bash
-# グローバル（すべてのプロジェクトで利用可能）
-cp -r skills/pr-review ~/.claude/skills/
+#### 方法2：Claude Code プラグインマーケットプレイス経由
 
-# プロジェクトレベル（現在のプロジェクトで利用可能、git にコミット可能）
-mkdir -p .claude/skills
-cp -r skills/pr-review .claude/skills/
-```
-
-#### 方法3：プラグイン ZIP をダウンロード
-
-releases から `github-fetch-plugin.zip` をダウンロードして skills ディレクトリに展開。
+1. Claude Code で Skills を有効化：Settings > Capabilities > "Skills" をオン
+2. マーケットプレイスソースを追加：
+   ```
+   /plugin marketplace add ZhangHanDong/github-fetch
+   ```
+3. Skill をインストール：
+   ```
+   /plugin install pr-review@github-fetch
+   ```
 
 ### 使用方法
 

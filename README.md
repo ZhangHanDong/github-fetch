@@ -222,26 +222,31 @@ This project includes a Claude Code Skill for PR review and fixing. The skill au
 
 ### Installation
 
-#### Option 1: Install as Claude Code Plugin (Recommended)
+#### Option 1: Project-Level Installation (Recommended)
+
+Clone or copy the skill into your project's `skills/` directory:
 
 ```bash
-claude plugins add https://github.com/ZhangHanDong/github-fetch
+# Clone repo and copy skill to your project
+git clone https://github.com/ZhangHanDong/github-fetch.git
+cp -r github-fetch/skills/pr-review your-project/skills/
+
+# Or if already using this library, skills are included at skills/pr-review/
 ```
 
-#### Option 2: Copy Skill Manually
+The skill will be automatically discovered by Claude Code when working in the project.
 
-```bash
-# Global (available in all projects)
-cp -r skills/pr-review ~/.claude/skills/
+#### Option 2: Via Claude Code Plugin Marketplace
 
-# Project-level (available in current project, can be committed to git)
-mkdir -p .claude/skills
-cp -r skills/pr-review .claude/skills/
-```
-
-#### Option 3: Download Plugin ZIP
-
-Download `github-fetch-plugin.zip` from releases and extract to your skills directory.
+1. Enable Skills in Claude Code: Settings > Capabilities > Toggle "Skills" on
+2. Add marketplace source:
+   ```
+   /plugin marketplace add ZhangHanDong/github-fetch
+   ```
+3. Install the skill:
+   ```
+   /plugin install pr-review@github-fetch
+   ```
 
 ### Usage
 
